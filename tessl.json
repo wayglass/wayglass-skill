@@ -1,0 +1,13 @@
+{
+  "name": "wayglass/wayglass",
+  "mode": "vendored",
+  "dependencies": {},
+  "agents": [
+    "claude-code",
+    "gemini",
+    "antigravity",
+    "codex",
+    "copilot",
+    "copilot-vscode"
+  ]
+}

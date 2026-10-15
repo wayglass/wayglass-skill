@@ -1,0 +1,10 @@
+{
+  "name": "wayglass/wayglass",
+  "description": "Agent skills for working through Wayglass: declare an intent, commit with the why, propose under policy, land only what is approved, and review other agents' changes with a real reason.",
+  "private": false,
+  "skills": [
+    "skills/wayglass",
+    "skills/wayglass-reviewer"
+  ],
+  "version": "0.1.0"
+}

@@ -1,16 +1,17 @@
 ---
 name: wayglass-reviewer
-description: "Review another agent's change as a Wayglass reviewer agent: list the agent_review queue with wayglass review --for agent --json, read the change with wayglass diff, check it against its declared goal, reason and paths, run its tests, and approve or reject with a reason that says what was checked, respecting the no-self-approval and different-model-family rules. Use when asked to act as a reviewer agent, to work through pending_agent changes, or to approve or reject a Wayglass intent. Not for making your own change through Wayglass (use the wayglass skill) and never for changes policy routed to a person (pending_human or quarantined)."
+description: "Review another agent's change as a Wayglass reviewer agent: list the agent_review queue with wayglass review --for agent --json, read the change with wayglass diff, check it against its declared goal, reason and paths, run its tests, and approve or reject with a reason that says what was checked, bound to the decision reviewed and respecting the no-self-approval and different-model-family rules. Use when the user asks for a reviewer agent, to work through pending_agent changes, to review, check or sign off on another agent's change or a Wayglass intent, or to approve or reject a change in Wayglass. Not for making a change through Wayglass (use the wayglass skill) and never for changes policy routed to a person (pending_human or quarantined)."
 license: "MIT"
 ---
 
 # Wayglass reviewer
 
-Policy sends some changes to `agent_review`: another agent must look before
-they land. You are that agent. You read the change, check it against the why
-its author declared, and record a verdict with a reason that a person can
-check later. Your name, model family and reason go into the audit log and
-into the note on the landed commit.
+Policy sends some changes to `agent_review`: a reviewer that is not the
+author must look before they land. When the rule names `reviewer: agent`,
+or the project runs no AI reviewer, that reviewer is you. You read the
+change, check it against the why its author declared, and record a verdict
+with a reason that a person can check later. Your name, model family and
+reason go into the audit log and into the note on the landed commit.
 
 ## Rules
 
@@ -21,6 +22,10 @@ into the note on the landed commit.
 - Never decide a change you wrote. Your name is `data.agent` in
   `wayglass doctor --json`; skip queue items whose `intent.agent` is you. The
   Worker refuses the author with `conflict`.
+- Bind the verdict to the decision you read: pass `--decision <decision.id>`
+  from the queue item. If the author proposed again meanwhile, the Worker
+  refuses with `decision_replaced`; list the queue again and review the new
+  decision.
 - When `decision.reviewer_different_family` is true, approve only if your
   model family differs from the author's (`intent.family`). Never declare a
   family you are not. A refused approval comes back as `same_family` or
@@ -50,8 +55,8 @@ into the note on the landed commit.
 ## Workflow
 
 1. **Set up.** `export WAYGLASS_AGENT_FAMILY=claude` (or `openai`, `gemini`,
-   `other`), then `wayglass doctor --json` from a checkout of the project.
-   Note `data.agent`. If doctor fails, stop and ask your user; the
+   `meta`, `other`), then `wayglass doctor --json` from a checkout of the
+   project. Note `data.agent`. If doctor fails, stop and ask your user; the
    `wayglass` skill covers keys and login.
 
 2. **List the queue.**
@@ -60,12 +65,12 @@ into the note on the landed commit.
    wayglass review --for agent --json
    ```
 
-   Each item in `data.queue` has an `intent` (`id`, `agent`, `goal`,
-   `reason`, `declared_paths`, `actual_paths`, `family`) and a `decision`
-   (`id`, `matched_rule`, `reason`, `tags`, `files`, `approvals`,
-   `reviewer_different_family`). Skip items you authored and items whose
-   family rule you cannot meet. An empty queue means there is nothing to do;
-   say so and stop. `data.untrusted` names the fields the author wrote.
+   `data.queue` holds one item per intent, its latest decision only. Each
+   has an `intent` (`id`, `agent`, `goal`, `reason`, `declared_paths`,
+   `actual_paths`, `family`) and a `decision` (`id`, `matched_rule`,
+   `reason`, `tags`, `files`, `approvals`, `reviewer_different_family`).
+   An empty queue means there is nothing to do; say so and stop.
+   [references/queue.md](references/queue.md) lists every field.
 
 3. **Read the change.**
 
@@ -101,34 +106,28 @@ into the note on the landed commit.
 5. **Decide with a reason.**
 
    ```sh
-   wayglass approve i5e39df9bcd --reason "Ran go test ./... on the pushed head: pass. Diff changes only docs/limits.md, inside the declared docs/**, and matches the limits in worker/src/limits.ts." --json
-   wayglass reject i5e39df9bcd --reason "web/login.ts logs the submitted password when the check fails; remove that line. Tests pass otherwise." --json
+   wayglass approve i5e39df9bcd --decision d7a1c2e3f4 --reason "Ran go test ./... on the pushed head: pass. Diff changes only docs/limits.md, inside the declared docs/**, and matches the limits in worker/src/limits.ts." --json
+   wayglass reject i5e39df9bcd --decision d7a1c2e3f4 --reason "web/login.ts logs the submitted password when the check fails; remove that line. Tests pass otherwise." --json
    ```
 
    Success: `data.verdict`, `data.decision.status` (`approved`, `rejected`, or
    still pending when more approvals are needed), `data.approvals` and
    `data.next`. A rejection tells the author what to change, so name the
-   file and the problem.
+   file and the problem. Every refusal and its exit code is in
+   [references/refusals.md](references/refusals.md).
 
 6. **Report.** Tell your user each intent you decided, the verdict and the
    reason, and the items you skipped and why.
 
-## Refusals
+## References
 
-| Exit | `error.code` | Meaning |
-|---|---|---|
-| 2 | `usage` | Missing, placeholder or filler reason, or an unknown `--family`. Write what you checked. |
-| 1 | `conflict` | You wrote this change, it was already decided, the intent is no longer active, or it has nothing proposed. Do not retry. |
-| 4 | `needs_human` | Policy routed this change to a person. Leave it and tell your user. |
-| 1 | `superseded` | The intent was re-stacked after it was proposed; that decision no longer counts. Skip it until the author proposes again. |
-| 1 | `same_family` | Policy needs a reviewer from a family other than the author's. Leave it. |
-| 1 | `family_required` | You or the author declared no family. Set `WAYGLASS_AGENT_FAMILY` to your real family; if the author declared none, leave it. |
-| 1 | `not_found` | Wrong intent id or project. |
+- [references/queue.md](references/queue.md): every field of a queue item
+  and of `wayglass diff`, and which ones are untrusted.
+- [references/refusals.md](references/refusals.md): the exit codes and
+  `error.code` values `approve` and `reject` can return, and what to do.
 
 ## Sources
 
-Written against the `wayglass` CLI help and source at commit `397d978`
-(October 13, 2026), and `c818634` (October 14, 2026) for `data.untrusted`: `review`, `diff`, `approve` and `reject`, and the Worker's
-decide checks. `scripts/cli-surface.txt` in this skill's repository is the
-command and flag list the examples are checked against. When the installed
-CLI differs, trust `wayglass <command> --help`.
+The release this was written against is named at the end of
+[references/refusals.md](references/refusals.md). When the installed CLI
+differs from this text, trust `wayglass <command> --help`.
