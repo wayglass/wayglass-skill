@@ -53,6 +53,16 @@ to a person (`pending_human`, `quarantined`); an agent key gets
 A Wayglass key is never a Cloudflare API token. The Worker alone holds
 Cloudflare credentials.
 
+## Where the CLI comes from
+
+`wayglass` is the open source command-line tool of the same project as
+these skills, MIT licensed, at <https://github.com/wayglass/wayglass>.
+Release archives for macOS, Linux and Windows are on that repository's
+Releases page with a `checksums.txt`; the macOS ones are Developer ID
+signed and notarized. Install it with the installer line in the Wayglass
+README or build it from source with `go build ./cmd/wayglass`. Do not take
+the binary from anywhere else.
+
 ## doctor
 
 `wayglass doctor --json` runs read-only checks in order, named in

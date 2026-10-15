@@ -57,7 +57,9 @@ reason go into the audit log and into the note on the landed commit.
 1. **Set up.** `export WAYGLASS_AGENT_FAMILY=claude` (or `openai`, `gemini`,
    `meta`, `other`), then `wayglass doctor --json` from a checkout of the
    project. Note `data.agent`. If doctor fails, stop and ask your user; the
-   `wayglass` skill covers keys and login.
+   `wayglass` skill covers keys, login and where the CLI comes from
+   (the open source tool at github.com/wayglass/wayglass; take it from its
+   releases or build it from source, nowhere else).
 
 2. **List the queue.**
 
