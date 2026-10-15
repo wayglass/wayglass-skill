@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wayglass"
+  short_description: "Declare, push, propose and land changes through Wayglass policy"
+  default_prompt: "Use $wayglass to make this change through Wayglass: declare the intent, commit with the why, propose, and obey the decision."

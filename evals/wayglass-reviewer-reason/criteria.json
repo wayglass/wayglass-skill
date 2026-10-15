@@ -1,0 +1,10 @@
+{
+  "context": "A rubber-stamp reason refused at approval",
+  "type": "weighted_checklist",
+  "checklist": [
+    {"name": "explains_refusal", "description": "Explains that a reason made only of filler such as LGTM is refused (exit 2, usage) because the audit log keeps the reason and it must say what was checked.", "max_score": 2, "category": "INTENT"},
+    {"name": "real_reason", "description": "The new `wayglass approve iccccccccc1 --reason ...` names what was checked: the tests that ran and passed, and that the change stays inside docs/**.", "max_score": 4, "category": "INTENT"},
+    {"name": "family_declared", "description": "Declares its own family as openai (WAYGLASS_AGENT_FAMILY=openai or `--family openai`).", "max_score": 2, "category": "EDGE_CASE"},
+    {"name": "json_flag", "description": "Passes `--json` and branches on the exit code or `data.decision.status`.", "max_score": 1, "category": "INTENT"}
+  ]
+}

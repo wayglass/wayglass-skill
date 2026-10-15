@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "skills": [
+    "skills/wayglass/SKILL.md",
+    "skills/wayglass-reviewer/SKILL.md"
+  ],
+  "checks": [
+    {
+      "name": "Check commands against the CLI surface and sweep the prose",
+      "command": [
+        "sh",
+        "scripts/check.sh"
+      ]
+    }
+  ],
+  "frontmatter": {
+    "allowedKeys": [
+      "name",
+      "description",
+      "license"
+    ],
+    "requireDirectoryName": true
+  }
+}

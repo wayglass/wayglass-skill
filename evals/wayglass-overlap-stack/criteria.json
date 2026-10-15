@@ -1,0 +1,11 @@
+{
+  "context": "A stack re-plan where the agent is the intent that waits",
+  "type": "weighted_checklist",
+  "checklist": [
+    {"name": "reads_role", "description": "Recognises that it is `then`, so its intent should build on i2222222222 rather than race it.", "max_score": 2, "category": "INTENT"},
+    {"name": "suggestion_only", "description": "States that the re-plan is a suggestion and nothing was re-planned automatically.", "max_score": 1, "category": "INTENT"},
+    {"name": "restack_command", "description": "Re-plans with `wayglass intent restack i1111111111 --on i2222222222 --reason \"...\" --json` (the `replan.command`, with a real reason that says why it builds on i2222222222) rather than declaring a new intent with `--on` and abandoning the old one, or an invented command such as `intent stack` or `intent update`.", "max_score": 3, "category": "EDGE_CASE"},
+    {"name": "propose_again", "description": "Says that the intent keeps its id, that any earlier decision no longer counts so it proposes again after the restack, that it lands after i2222222222, and that a `restack_conflict` means nothing changed and the user hears about it.", "max_score": 2, "category": "INTENT"},
+    {"name": "no_premature_propose", "description": "Does not propose the overlapping change on the old intent before re-planning, and checks with the user before discarding work.", "max_score": 2, "category": "EDGE_CASE"}
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Wayglass reviewer"
+  short_description: "Review agent_review changes in Wayglass with a real reason"
+  default_prompt: "Use $wayglass-reviewer to review the changes waiting for a reviewer agent in this Wayglass project."
