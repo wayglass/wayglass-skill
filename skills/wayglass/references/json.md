@@ -140,18 +140,38 @@ the one to decide. `residency_pending`: the project's state is still moving
 to its jurisdiction; retry later. `upstream_error` is an Artifacts hiccup;
 one retry is reasonable. Read `message` for the rest.
 
-## Land error codes in full
+## Land errors
 
-| Code | Meaning |
+All exit 1 with these `error.code` values; nothing reached the trunk.
+
+| Code | Meaning and next step |
 |---|---|
-| `trunk_moved` | The trunk moved during the land; a retry usually succeeds. |
-| `land_conflict` | Your change conflicts with the trunk. |
-| `repropose_required` | The merge would touch files the decision did not cover. |
-| `policy_changed` | The trunk's `.wayglass/policy.yaml` changed after your change was decided (or the Worker cannot tell which policy decided it), so no trunk token was issued; the change is decided again under the current policy. |
-| `fork_moved` | The fork no longer holds the approved commit. |
-| `commit_missing` | The approved commit is not here and the fork could not be read. |
-| `not_author` | Only the key that declared the intent (or the admin) can land it. |
-| `conflict` | A stacked intent waits for its parent to land; another land is in progress, or a trunk token from the last land is still alive (try again shortly); or the decision is not approved or was superseded by a restack (propose again). |
+| `trunk_moved` | The trunk moved during the land. Run `wayglass land --json` again. |
+| `land_conflict` | Your change conflicts with the trunk. Run `wayglass sync --json` (below), resolve, push, propose again. |
+| `repropose_required` | The merge would touch files the decision did not cover. Run `wayglass sync --json`, push, propose again. |
+| `policy_changed` | The trunk's `.wayglass/policy.yaml` changed after your change was decided (or the Worker cannot tell which policy decided it), so no trunk token was issued. Run `wayglass sync --json`, push, propose again; the change is decided under the current policy (a merged policy edit goes to a person: exit 4). |
+| `fork_moved` | The fork no longer holds the approved commit. Push and propose again. |
+| `commit_missing` | The approved commit is not here and the fork could not be read. Run doctor, then retry. |
+| `not_author` | Only the key that declared the intent (or the admin) can land it. Ask the author. |
+| `conflict` | Read the message. A stacked intent waits for its parent to land; another land in progress, or a trunk token from the last land still alive, means try again shortly; a decision that is not approved, or one superseded by a restack, means propose again. |
+
+### Recovering with `wayglass sync`
+
+Run it in your intent's own clone. It fetches the current trunk with a
+60-second read-only token and merges it into your branch (never a rebase):
+
+```bash
+wayglass sync --json     # data.merged, data.trunk_head, data.conflicts, data.next
+wayglass push --json
+wayglass propose --json  # decided again, merged trunk changes included
+```
+
+On `sync_conflict` (exit 1) the merge is left in progress and
+`error.details.conflicts` lists the files: resolve them, `git add` them,
+`git commit --no-edit`, then push and propose. `not_fork_clone` (exit 2):
+you are not in the checkout that declared the intent. `dirty`: commit or
+stash first. A stacked intent refuses with `conflict` until its parent has
+landed.
 
 ## Source
 

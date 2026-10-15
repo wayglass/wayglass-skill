@@ -16,8 +16,10 @@ intent, propose, and obey the decision.
   and never colours output. Every reply is one envelope,
   `{"v":1,"ok":true,"data":{...}}` or
   `{"v":1,"ok":false,"error":{"code":"...","message":"..."}}`; branch on
-  the exit code (`0` ok, `1` error, `2` usage, `3` blocked by policy, `4` a
-  person must act) and on `error.code`, never on human text.
+  the exit code (the propose table below; `1` is an error and `2` a usage
+  mistake) and on `error.code`, never on human text.
+- Wayglass merges and never rebases: a restack or a sync keeps your
+  commits as they are.
 - Never approve your own work, and never approve a change policy routed to a
   person. The Worker refuses the first (`conflict`); the second is yours to
   respect.
@@ -147,8 +149,11 @@ intent, propose, and obey the decision.
    ```
 
    Success has `data.verified: true` (the Worker checked the trunk holds
-   exactly the approved change) and `data.commit`. Failures are in
-   [Land errors](#land-errors).
+   exactly the approved change) and `data.commit`. Every failure exits 1
+   with nothing on the trunk; most are fixed by `wayglass sync --json`
+   (fetch and merge the trunk, never a rebase), then push and propose
+   again. The codes and the sync recovery steps are in
+   [references/json.md](references/json.md).
 
 8. **Verify, hand on or stop.** After a land,
    `wayglass why <file>:<line> --json` on a line you changed shows your
@@ -169,7 +174,7 @@ Find your intent id in `replan.first` or `replan.then`.
   user before re-planning, then run `replan.command`:
   `wayglass intent restack <then> --on <first> --reason "..." --json` with a
   reason that says why your change builds on theirs. It keeps your intent
-  id, merges your commits onto `first`'s head (never rebases) and pushes.
+  id, merges your commits onto `first`'s head and pushes.
   `restack_conflict` before anything moved means nothing changed: tell your
   user. If `first` moved during the restack, the message tells you to finish
   by hand: merge the named ref, resolve, `wayglass push`. Any earlier
@@ -178,44 +183,11 @@ Find your intent id in `replan.first` or `replan.then`.
 - `split`: only globs collide and nothing is pushed yet. Abandon and declare
   again with the narrower `--path` values you actually need.
 
-## Land errors
-
-All exit 1 with these `error.code` values; nothing reached the trunk.
-[references/json.md](references/json.md) explains each code.
-
-| Code | Next step |
-|---|---|
-| `trunk_moved` | Run `wayglass land --json` again. |
-| `land_conflict` | `wayglass sync --json` (below), resolve, push, propose again. |
-| `repropose_required` | `wayglass sync --json`, push, propose again. |
-| `policy_changed` | `wayglass sync --json`, push, propose again; the current policy decides (a merged policy edit goes to a person: exit 4). |
-| `fork_moved` | Push and propose again. |
-| `commit_missing` | Run doctor, then retry. |
-| `not_author` | Ask the author to land it. |
-| `conflict` | Read the message: wait for the parent intent or the previous land to finish, or go back to step 6. |
-
-### Recovering with `wayglass sync`
-
-Run it in your intent's own clone. It fetches the current trunk with a
-60-second read-only token and merges it into your branch (never a rebase):
-
-```bash
-wayglass sync --json     # data.merged, data.trunk_head, data.conflicts, data.next
-wayglass push --json
-wayglass propose --json  # decided again, merged trunk changes included
-```
-
-On `sync_conflict` (exit 1) the merge is left in progress and
-`error.details.conflicts` lists the files: resolve them, `git add` them,
-`git commit --no-edit`, then push and propose. `not_fork_clone` (exit 2):
-you are not in the checkout that declared the intent. `dirty`: commit or
-stash first. A stacked intent refuses with `conflict` until its parent has
-landed.
-
 ## References
 
 - [references/json.md](references/json.md): the `data` fields of declare,
-  push, overlaps, propose, land, sync and session show, and the error codes.
+  push, overlaps, propose, land, sync and session show, the error codes,
+  and recovering a failed land with `wayglass sync`.
 - [references/setup.md](references/setup.md): logging in with a per-agent
   key, environment variables, doctor checks, and `wayglass agent setup`.
 

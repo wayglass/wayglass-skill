@@ -42,13 +42,22 @@ and tell agents to take it from there or build it from source. The table
 will be updated when Socket scans that text.
 
 Tessl's own security review of the plugin rated 0.1.0
-[low risk](https://tessl.io/registry/wayglass/wayglass/0.1.0/security).
+[low risk](https://tessl.io/registry/wayglass/wayglass/0.1.0/security);
+0.1.1's report is at the same path under
+[0.1.1](https://tessl.io/registry/wayglass/wayglass/0.1.1/security).
 Four pinned static scanners were also run on both skills from a clean
 export: skilllint 0.3.0 and skilldoctor 0.2.4 (no findings), NVIDIA
 SkillSpector 2.12.0 without its model pass (low risk; its only finding is
 the "not limited to" wording of the MIT licence text) and Cisco's AI Skill
 Scanner 2.2.2 (safe, no findings).
 
-For the whole plugin, Tessl also publishes
-[eval results](https://tessl.io/registry/wayglass/wayglass/0.1.0/evals)
-for 0.1.0; the four scenarios were still running when this was written.
+For the whole plugin, Tessl also publishes eval results. The
+[0.1.0 run](https://tessl.io/registry/wayglass/wayglass/0.1.0/evals) scored
+the skills below the baseline (25% against 55%, one run per scenario)
+because three scenarios produced no answer at all: the tasks asked the agent
+to describe commands, the skill told it to run `wayglass doctor` first, and
+the sandbox has no `wayglass` binary, so the agent stopped as instructed.
+0.1.1 rewrites the four scenarios as written exercises that say the CLI is
+absent and ask for the answer in a file; its
+[eval results](https://tessl.io/registry/wayglass/wayglass/0.1.1/evals) are
+recorded here once the run completes.

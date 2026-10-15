@@ -1,12 +1,9 @@
 # TODO
 
-- [ ] Record the 0.1.0 eval results. The Tessl eval run for
-  `wayglass/wayglass@0.1.0` (four scenarios) was in progress when
-  SECURITY.md was last written; the overview showed an aggregate of 85 and
-  0.66x before the per-scenario data appeared. Read `tessl eval view` for
-  the run, note which scenarios the baseline solved on its own (see what
-  charmedimsure learned about baseline strength), and either tighten those
-  scenarios or record the result as is in SECURITY.md.
+- [ ] Record the 0.1.1 eval results in SECURITY.md once the publish run
+  finishes (`tessl eval list --plugin wayglass/wayglass`). If a scenario
+  still scores 0 with the skill, read its grader notes: a missing answer
+  means the task wording, not the skill.
 - [ ] Record the Socket re-scan. The 0.1.0 scan did not see the sentence on
   where the `wayglass` CLI comes from (added after publish). Once the Socket
   pages show a later analysis date than Oct 15, 2026, 03:49 AM UTC, update
