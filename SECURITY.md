@@ -52,12 +52,14 @@ the "not limited to" wording of the MIT licence text) and Cisco's AI Skill
 Scanner 2.2.2 (safe, no findings).
 
 For the whole plugin, Tessl also publishes eval results. The
-[0.1.0 run](https://tessl.io/registry/wayglass/wayglass/0.1.0/evals) scored
-the skills below the baseline (25% against 55%, one run per scenario)
-because three scenarios produced no answer at all: the tasks asked the agent
-to describe commands, the skill told it to run `wayglass doctor` first, and
-the sandbox has no `wayglass` binary, so the agent stopped as instructed.
-0.1.1 rewrites the four scenarios as written exercises that say the CLI is
-absent and ask for the answer in a file; its
-[eval results](https://tessl.io/registry/wayglass/wayglass/0.1.1/evals) are
-recorded here once the run completes.
+[0.1.1 run](https://tessl.io/registry/wayglass/wayglass/0.1.1/evals)
+(2026-10-15, one run per scenario, deepseek-v4.1-flash) scored 100% on all
+four scenarios with the skills against 73% for the same agent without them,
+in fewer turns and at lower cost. The earlier
+[0.1.0 run](https://tessl.io/registry/wayglass/wayglass/0.1.0/evals) had
+scored the skills below the baseline because three scenarios produced no
+answer at all: the tasks asked the agent to describe commands, the skill
+told it to run `wayglass doctor` first, and the sandbox has no `wayglass`
+binary, so the agent stopped as instructed. 0.1.1 rewrote the scenarios as
+written exercises that say the CLI is absent and ask for the answer in a
+file.
