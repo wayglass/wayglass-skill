@@ -101,7 +101,8 @@ reason go into the audit log and into the note on the landed commit.
      ```
 
      Run the tests inside that worktree, then
-     `git worktree remove ../review-i5e39df9bcd`.
+     `git worktree remove ../review-i5e39df9bcd`. If the parent directory
+     is not writable, put the worktree under a temporary directory instead.
    - No credentials, tokens or keys in the diff, and no edits to
      `.wayglass/policy.yaml` that loosen the rules the change is judged by.
 

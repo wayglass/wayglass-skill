@@ -63,3 +63,11 @@ told it to run `wayglass doctor` first, and the sandbox has no `wayglass`
 binary, so the agent stopped as instructed. 0.1.1 rewrote the scenarios as
 written exercises that say the CLI is absent and ask for the answer in a
 file.
+
+On 2026-10-15 a stranger-style run on a second Cloudflare account installed
+the published skills for Claude Code and Codex and had both agents work a
+self-hosted Wayglass v0.1.0 end to end: each declared before editing,
+committed a reason, obeyed the propose status, completed a cross-family
+review and landed; same-family and self-approval probes were refused. The
+only failures were in the launcher environment, not in the skills or the
+CLI.

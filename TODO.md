@@ -6,9 +6,9 @@
   the two Socket cells and remove the sentence saying the table will be
   updated. The Snyk W011 warning is inherent to the skills' purpose and
   stays documented, as flared's is.
-- [ ] Run a live agent through both skills on a `demo-test-*` project and
-  record what it got wrong; task 043 in the private meta repo does this
-  with the published skills installed.
+- [ ] Release 0.1.2 when the next skill change comes. The reviewer skill's
+  note on an unwritable worktree parent (from the live run on Oct 15, 2026)
+  is committed but not in the published 0.1.1.
 - [ ] Add skill metrics to CI, as the README promises: the skills.sh audits,
   the Tessl quality reviews and the eval results per release, so SECURITY.md
   and the badges come from CI output rather than hand edits.
